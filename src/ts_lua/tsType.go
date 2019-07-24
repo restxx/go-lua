@@ -7,6 +7,7 @@ import (
 
 type Person struct {
 	Name string
+	Buf  []byte
 }
 
 const luaPersonTypeName = "person"
@@ -23,7 +24,7 @@ func registerPersonType(L *lua.LState) {
 
 // Constructor
 func newPerson(L *lua.LState) int {
-	person := &Person{L.CheckString(1)}
+	person := &Person{Name: L.CheckString(1), Buf: []byte{1, 2, 3, 4, 5}}
 	ud := L.NewUserData()
 	ud.Value = person
 	L.SetMetatable(ud, L.GetTypeMetatable(luaPersonTypeName))
@@ -43,6 +44,7 @@ func checkPerson(L *lua.LState) *Person {
 
 var personMethods = map[string]lua.LGFunction{
 	"name": personGetSetName,
+	"buf":  personGetSetBuf,
 }
 
 // Getter and setter for the Person#Name
@@ -57,6 +59,22 @@ func personGetSetName(L *lua.LState) int {
 		return 0
 	}
 	L.Push(lua.LString(p.Name)) // getName
+	return 1
+}
+
+func personGetSetBuf(L *lua.LState) int {
+	p := checkPerson(L)
+	if L.GetTop() >= 2 { // setName
+		tbl := L.CheckTable(2)
+		p.Buf = p.Buf[:0]
+		tbl.ForEach(func(key, value lua.LValue) {
+			fmt.Println(value)
+			// p.Buf[0] = value
+		})
+
+		return 0
+	}
+
 	return 1
 }
 
