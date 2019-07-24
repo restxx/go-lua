@@ -68,7 +68,10 @@ func personGetSetBuf(L *lua.LState) int {
 		tbl := L.CheckTable(2)
 		p.Buf = p.Buf[:0]
 		tbl.ForEach(func(key, value lua.LValue) {
-			fmt.Println(value)
+			//n := uint8(value.(lua.LNumber))
+			if intv, ok := value.(lua.LNumber); ok {
+				fmt.Println(uint8(intv))
+			}
 			// p.Buf[0] = value
 		})
 
@@ -82,7 +85,7 @@ func main() {
 	L := lua.NewState()
 	defer L.Close()
 	registerPersonType(L)
-	if err := L.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\person.lua"); err != nil {
+	if err := L.DoFile("D:\\GO_CODE\\go-lua\\src\\ts_lua\\person.lua"); err != nil {
 		panic(err)
 	}
 }
