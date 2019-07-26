@@ -24,7 +24,7 @@ func registerPersonType(L *lua.LState) {
 
 // Constructor
 func newPerson(L *lua.LState) int {
-	person := &Person{Name: L.CheckString(1), Buf: []byte{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}}
+	person := &Person{Name: L.CheckString(1), Buf: make([]byte, 10)[:]}
 	ud := L.NewUserData()
 	ud.Value = person
 	L.SetMetatable(ud, L.GetTypeMetatable(luaPersonTypeName))
@@ -64,19 +64,18 @@ func personGetSetName(L *lua.LState) int {
 
 func personGetSetBuf(L *lua.LState) int {
 	p := checkPerson(L)
-	if L.GetTop() >= 2 { // setName
+	if L.GetTop() >= 2 { // setBuf
 		tbl := L.CheckTable(2)
-		//p.Buf = p.Buf[:0]
 		tbl.ForEach(func(key, value lua.LValue) {
 			if intv, ok := value.(lua.LNumber); ok {
 				i := int(key.(lua.LNumber)) - 1
 				p.Buf[i] = uint8(intv)
-				//p.Buf[0] = byte(intv)
 				fmt.Println(uint8(intv))
 			}
 		})
 		return 0
 	}
+	// getbuf
 	tbl := L.NewTable()
 	for _, v := range p.Buf {
 		tbl.Append(lua.LNumber(v))
@@ -89,7 +88,7 @@ func main() {
 	L := lua.NewState()
 	defer L.Close()
 	registerPersonType(L)
-	if err := L.DoFile("D:\\GO_CODE\\go-lua\\src\\ts_lua\\person.lua"); err != nil {
+	if err := L.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\person.lua"); err != nil {
 		panic(err)
 	}
 }

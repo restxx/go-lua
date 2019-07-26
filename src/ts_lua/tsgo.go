@@ -5,6 +5,8 @@ import (
 	lua "github.com/yuin/gopher-lua"
 )
 
+// go 调用lua函数 lua调用go函数示例
+
 func main() {
 	L := lua.NewState()
 	defer L.Close()
@@ -21,6 +23,7 @@ func main() {
 		panic(err)
 	}
 
+	// go 调用lua中的max函数
 	fn := L2.GetGlobal("max")
 	_ = L2.CallByParam(lua.P{
 		Fn:      fn,
