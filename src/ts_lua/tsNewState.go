@@ -1,3 +1,4 @@
+// 测试10000个goroutine调用luastate内存占用
 package main
 
 import (
@@ -39,18 +40,18 @@ func _ts() {
 			`); err != nil {
 		panic(err)
 	}
-
+	time.Sleep(10 * time.Second)
 }
 
-// 这个测试有问题go 执行完就退出了
+// 占用内存2135MB 単个210K
 func test2() {
 	for i := 0; i < 10000; i++ {
 		go _ts()
 	}
-	time.Sleep(100 * time.Second)
+	time.Sleep(20 * time.Second)
 }
 
 func main() {
-	//test1()
+	// test1()
 	test2()
 }
