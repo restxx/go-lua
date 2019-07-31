@@ -1,3 +1,6 @@
+// 提前GC并不会释放内存 之后的lua脚本仍可以正常运行
+// 因为指針己经传入了luaState 除非先关闭luaState
+// recuTest 相互引用无法释放
 package main
 
 import (
@@ -5,6 +8,7 @@ import (
 	lua "github.com/yuin/gopher-lua"
 	luar "layeh.com/gopher-luar"
 	"runtime"
+	"runtime/debug"
 	"sync"
 	"time"
 	"unsafe"
@@ -33,16 +37,30 @@ func (s *Son) SetDad(f *Father) {
 }
 
 func test() {
+	fmt.Println(debug.SetGCPercent(1))
+
 	wg.Add(1)
 	L := lua.NewState()
-	defer L.Close()
+	// defer L.Close()
 
-	f := &Father{Data: [num]byte{0}}
+	f := &Father{}
 	fmt.Println(unsafe.Sizeof(*f))
 	L.SetGlobal("f", luar.New(L, f))
 
-	s := &Son{Data: [num]byte{0}}
+	runtime.SetFinalizer(f, func(_f *Father) {
+		fmt.Println("Father内存回收")
+	})
+
+	s := &Son{}
 	L.SetGlobal("s", luar.New(L, s))
+
+	runtime.SetFinalizer(s, func(_s *Son) {
+		fmt.Println("Son内存回收")
+	})
+
+	// L.Close()
+	runtime.GC()
+	// L.Close()
 
 	if err := L.DoString(`
 				f:SetSon(s)
@@ -50,16 +68,36 @@ func test() {
 					 	`); err != nil {
 		panic(err)
 	}
-	time.Sleep(5 * time.Second)
+
+	time.Sleep(1 * time.Second)
 	wg.Done()
 }
 
-func main() {
-	for i := 0; i < 5000; i++ {
-		go test()
-	}
-	fmt.Println(runtime.NumGoroutine())
-	wg.Wait()
+func recuTest() {
+	fmt.Println(debug.SetGCPercent(1))
+
+	f := &Father{}
+	runtime.SetFinalizer(f, func(_f *Father) {
+		fmt.Println("Father内存回收")
+	})
+
+	s := &Son{}
+	runtime.SetFinalizer(s, func(_s *Son) {
+		fmt.Println("Son内存回收")
+	})
+
+	f.MySon = s
+	s.MyDad = f
+
 	runtime.GC()
-	time.Sleep(300 * time.Second)
+}
+
+func main() {
+
+	// test()
+	// wg.Wait()
+
+	recuTest()
+
+	time.Sleep(6 * time.Second)
 }
