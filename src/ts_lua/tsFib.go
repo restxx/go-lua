@@ -9,13 +9,13 @@ import (
 func main() {
 	start := time.Now()
 	var ret int
-	for i := 0; i < 35; i++ {
+	for i := 0; i < 30; i++ {
 		ret = GoFib(i)
 	}
 	fmt.Println(time.Now().Sub(start).Seconds())
 	fmt.Println(ret)
 
-	LuaFib(35)
+	LuaFib(30)
 }
 
 func GoFib(n int) int {
@@ -33,7 +33,7 @@ func LuaFib(n int) {
 	L2 := lua.NewState()
 	defer L2.Close()
 
-	if err := L2.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\Fib.lua"); err != nil {
+	if err := L2.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\lua_script\\Fib.lua"); err != nil {
 		panic(err)
 	}
 

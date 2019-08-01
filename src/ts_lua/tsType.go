@@ -88,7 +88,7 @@ func main() {
 	L := lua.NewState()
 	defer L.Close()
 	registerPersonType(L)
-	if err := L.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\person.lua"); err != nil {
+	if err := L.DoFile("D:\\GO_SOURCE\\go_lua\\src\\ts_lua\\lua_script\\person.lua"); err != nil {
 		panic(err)
 	}
 }

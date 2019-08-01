@@ -1,6 +1,7 @@
 // 提前GC并不会释放内存 之后的lua脚本仍可以正常运行
 // 因为指針己经传入了luaState 除非先关闭luaState
 // recuTest 相互引用无法释放
+
 package main
 
 import (
