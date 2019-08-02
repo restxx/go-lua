@@ -7,6 +7,7 @@ lua 调用 go函数100000 次
 go 调用 go Func 100000 次
 0.0020001
 lua 自加 100000次
+inside lua 0.017001000000000044
 0.017001
 ret=  5000050000
 go add 100000*1000 times
@@ -83,13 +84,17 @@ func luaAdd() {
 
 	if err := L.DoString(`
 		function Add()
+			local start = os.clock()
 			j = 0
 			for i=0, 100000, 1 do
 				j = i+j
 			end
+			print("inside lua "..os.clock()-start)	
 			return j
 		end
+		
 		return Add()
+		
 		`); err != nil {
 		panic(err)
 	}
@@ -170,6 +175,7 @@ func tsLuarNew() {
 			Name: "Tim",
 		}
 		L.SetGlobal("u", luar.New(L, u))
+
 		if err := L.DoString(`
 				u:SetToken("12345")
 				`); err != nil {

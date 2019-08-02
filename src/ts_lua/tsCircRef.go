@@ -59,16 +59,16 @@ func test() {
 		fmt.Println("Son内存回收")
 	})
 
-	// L.Close()
+	L.Close()
 	runtime.GC()
 	// L.Close()
 
-	if err := L.DoString(`
-				f:SetSon(s)
-				s:SetDad(f)
-					 	`); err != nil {
-		panic(err)
-	}
+	// if err := L.DoString(`
+	// 			f:SetSon(s)
+	// 			s:SetDad(f)
+	// 				 	`); err != nil {
+	// 	panic(err)
+	// }
 
 	time.Sleep(1 * time.Second)
 	wg.Done()
@@ -95,10 +95,10 @@ func recuTest() {
 
 func main() {
 
-	// test()
-	// wg.Wait()
+	test()
+	wg.Wait()
 
-	recuTest()
+	// recuTest()
 
 	time.Sleep(6 * time.Second)
 }
